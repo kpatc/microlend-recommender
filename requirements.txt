@@ -1,0 +1,45 @@
+# Core
+pandas==2.2.2
+numpy==1.26.4
+scipy==1.13.0
+scikit-learn==1.4.2
+
+# Recommendation Systems
+scikit-surprise==1.1.4
+implicit==0.7.2
+
+# Deep Learning (Neural CF)
+torch==2.3.0
+
+# Matrix Factorization extras
+lightfm==1.17
+
+# Experiment Tracking
+mlflow==2.13.0
+
+# Explainability
+shap==0.45.0
+
+# Visualization
+matplotlib==3.8.4
+seaborn==0.13.2
+plotly==5.22.0
+
+# Dashboard + API
+streamlit==1.35.0
+fastapi==0.111.0
+uvicorn==0.29.0
+pydantic==2.7.1
+
+# Data fetching
+ucimlrepo==0.0.7
+kaggle==1.6.14
+requests==2.31.0
+
+# Utils
+python-dotenv==1.0.1
+pyyaml==6.0.1
+loguru==0.7.2
+tqdm==4.66.4
+joblib==1.4.2
+pytest==8.2.0

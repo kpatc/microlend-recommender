@@ -1,0 +1,91 @@
+project:
+  name: "MicroLend Recommender"
+  description: "Financial product recommendation for African SMEs"
+
+data:
+  raw_path: "data/raw/"
+  processed_path: "data/processed/"
+  synthetic_path: "data/synthetic/"
+  n_synthetic_smes: 5000
+  n_products: 8
+
+products:
+  catalog:
+    - id: 1
+      name: "Microcredit 3 months"
+      category: "credit"
+      risk_level: "low"
+      min_revenue: 500
+    - id: 2
+      name: "Microcredit 12 months"
+      category: "credit"
+      risk_level: "medium"
+      min_revenue: 1000
+    - id: 3
+      name: "Agricultural insurance"
+      category: "insurance"
+      risk_level: "low"
+      min_revenue: 200
+    - id: 4
+      name: "Equipment leasing"
+      category: "leasing"
+      risk_level: "medium"
+      min_revenue: 2000
+    - id: 5
+      name: "Group savings"
+      category: "savings"
+      risk_level: "low"
+      min_revenue: 100
+    - id: 6
+      name: "Mobile payment setup"
+      category: "payments"
+      risk_level: "low"
+      min_revenue: 50
+    - id: 7
+      name: "Invoice financing"
+      category: "credit"
+      risk_level: "high"
+      min_revenue: 5000
+    - id: 8
+      name: "Crop advance loan"
+      category: "credit"
+      risk_level: "medium"
+      min_revenue: 300
+
+models:
+  svd:
+    n_factors: 50
+    n_epochs: 20
+    lr_all: 0.005
+    reg_all: 0.02
+  nmf:
+    n_factors: 15
+    n_epochs: 50
+  als:
+    factors: 50
+    regularization: 0.01
+    iterations: 30
+  neural_cf:
+    embedding_dim: 32
+    hidden_layers: [64, 32, 16]
+    dropout: 0.2
+    lr: 0.001
+    epochs: 30
+    batch_size: 256
+
+evaluation:
+  k_values: [1, 5, 10]
+  test_size: 0.2
+  random_state: 42
+
+hybrid:
+  cf_weight: 0.7
+  content_weight: 0.3
+
+mlflow:
+  experiment_name: "microlend_recommender"
+  tracking_uri: "sqlite:///mlflow.db"
+  registry:
+    model_name: "microlend_recommender"
+    auto_register: true
+    staging_metric: "rmse_mean"
