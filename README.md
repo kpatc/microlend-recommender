@@ -22,8 +22,6 @@
 - [CLI Reference](#cli-reference)
 - [MLflow Tracking & Model Registry](#mlflow-tracking--model-registry)
 - [REST API](#rest-api)
-- [Dashboard](#dashboard)
-- [Project Structure](#project-structure)
 - [Tech Stack](#tech-stack)
 
 ---
@@ -84,10 +82,9 @@ Raw Data (CRM log + SME profiles)
 │  @champion alias (prod)     │
 └─────────────────────────────┘
           │
-    ┌─────┴──────┐
-    ▼            ▼
-FastAPI       Streamlit
-REST API      Dashboard
+          ▼
+    FastAPI + Web UI
+    REST API / http://localhost:8000
 ```
 
 ---
@@ -301,7 +298,6 @@ make generate    # Generate synthetic raw dataset (4 CSV tables)
 make train       # Cross-validate → register best model → promote to @champion
 make register    # Re-promote @champion without retraining
 make mlflow-ui   # Launch MLflow UI at http://localhost:5000
-make dashboard   # Launch Streamlit dashboard at http://localhost:8501
 make api         # Start FastAPI server at http://localhost:8000
 make test        # Run pytest suite (14 tests)
 make clean       # Remove __pycache__ and build artifacts
@@ -416,70 +412,6 @@ Interactive docs at `http://localhost:8000/docs`.
 
 ---
 
-## Dashboard
-
-Launch with `make dashboard` → `http://localhost:8501`
-
-| Tab | Description |
-|---|---|
-| **SME Recommendations** | Select any SME or fill a 7-question cold-start form |
-| **Model Comparison** | RMSE / MAE / NDCG@10 bar charts across all models |
-| **Product Associations** | Co-adoption heatmap + item-item similarity for cross-selling |
-| **Latent Factor Space** | SVD product embeddings visualized with PCA (color by risk or category) |
-| **Business Insights** | Top products by country, adoption rates by sector × product, cold-start confidence curve |
-
----
-
-## Project Structure
-
-```
-microlend-recommender/
-│
-├── configs/
-│   └── config.yaml              # Model hyperparameters, paths, MLflow config
-│
-├── data/
-│   └── raw/                     # Generated CSV tables (gitignored)
-│       ├── sme_profiles.csv
-│       ├── sme_financial_profile.csv
-│       ├── product_interactions.csv
-│       └── product_catalog.csv
-│
-├── src/
-│   ├── pipeline.py              # Top-level train + register pipeline
-│   ├── tracking.py              # MLflow setup + Model Registry helpers
-│   ├── data/
-│   │   ├── loader.py            # DataLoader — loads raw tables, builds matrix
-│   │   ├── preprocessing.py     # SMEPreprocessor, build_surprise_dataset
-│   │   └── synthetic_generator.py  # RawDataGenerator — calibrated synthetic data
-│   ├── models/
-│   │   ├── user_based_cf.py     # UserBasedCF with sector similarity boost
-│   │   ├── item_based_cf.py     # ItemBasedCF, product association mining
-│   │   ├── matrix_factorization.py  # SVD / NMF / Baseline + pyfunc wrapper
-│   │   ├── neural_cf.py         # GMF + MLP NeuralCF (PyTorch)
-│   │   └── hybrid.py            # HybridRecommender
-│   ├── cold_start/
-│   │   └── solver.py            # ColdStartSolver, onboarding questions
-│   └── evaluation/
-│       └── metrics.py           # RMSE, MAE, Precision@K, NDCG@K, coverage
-│
-├── api/
-│   └── main.py                  # FastAPI app
-│
-├── dashboard/
-│   └── app.py                   # Streamlit 5-tab dashboard
-│
-├── tests/
-│   ├── test_models.py           # CF, cold-start, metrics unit tests
-│   └── test_preprocessing.py   # Preprocessor, train/test split tests
-│
-├── notebooks/                   # EDA + model exploration (Jupyter)
-├── Makefile
-└── requirements.txt
-```
-
----
-
 ## Tech Stack
 
 | Layer | Library | Version |
@@ -490,7 +422,6 @@ microlend-recommender/
 | Experiment tracking | MLflow | 3.14 |
 | Model Registry | MLflow (SQLite backend) | 3.14 |
 | REST API | FastAPI + uvicorn | 0.111 |
-| Dashboard | Streamlit | 1.35 |
 | Testing | pytest | 9.x |
 | Visualization | matplotlib, seaborn | 3.8 / 0.13 |
 
