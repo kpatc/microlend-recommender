@@ -189,36 +189,36 @@ For SMEs with zero interaction history:
 
 ## Screenshots
 
-### Interface MFI
+### MFI Web Interface
 
 The web interface is accessible at `http://localhost:8000` after `make api`.
 
-**Client existant — lookup & recommandations :**
+**Existing client — lookup & recommendations:**
 
-![Client existant — recommandations](docs/interface_exist_clt_rec.png)
+![Existing client — recommendations](docs/interface_exist_clt_rec.png)
 
-**Nouveau client — saisie du profil :**
+**New client — profile form:**
 
-![Nouveau client — formulaire](docs/nw_clt_fill_form.png)
+![New client — form](docs/nw_clt_fill_form.png)
 
-**Nouveau client — recommandations cold-start :**
+**New client — cold-start recommendations:**
 
-![Nouveau client — recommandations](docs/nw_clt_recs.png)
+![New client — recommendations](docs/nw_clt_recs.png)
 
 ### EDA — Exploratory Data Analysis
 
 <table>
 <tr>
-<td><img src="docs/eda_01_countries.png" width="400"/><br><em>Distribution par pays</em></td>
-<td><img src="docs/eda_02_sectors.png" width="400"/><br><em>Répartition sectorielle</em></td>
+<td><img src="docs/eda_01_countries.png" width="400"/><br><em>SME distribution by country</em></td>
+<td><img src="docs/eda_02_sectors.png" width="400"/><br><em>Sector distribution</em></td>
 </tr>
 <tr>
-<td><img src="docs/eda_03_revenue.png" width="400"/><br><em>Distribution des revenus (log)</em></td>
-<td><img src="docs/eda_04_financial_inclusion.png" width="400"/><br><em>Inclusion financière par pays</em></td>
+<td><img src="docs/eda_03_revenue.png" width="400"/><br><em>Revenue distribution (log scale)</em></td>
+<td><img src="docs/eda_04_financial_inclusion.png" width="400"/><br><em>Financial inclusion by country</em></td>
 </tr>
 <tr>
-<td><img src="docs/eda_05_interactions.png" width="400"/><br><em>Funnel interactions & adoptions</em></td>
-<td><img src="docs/eda_06_matrix.png" width="400"/><br><em>Structure matrice user-item & co-adoption</em></td>
+<td><img src="docs/eda_05_interactions.png" width="400"/><br><em>Interaction funnel & product adoptions</em></td>
+<td><img src="docs/eda_06_matrix.png" width="400"/><br><em>User-item matrix structure & co-adoption</em></td>
 </tr>
 </table>
 
@@ -230,8 +230,8 @@ The web interface is accessible at `http://localhost:8000` after `make api`.
 
 <table>
 <tr>
-<td><img src="docs/mlflow_train_runs.png" width="400"/><br><em>Runs d'entraînement</em></td>
-<td><img src="docs/mlflow_evaluation.png" width="400"/><br><em>Métriques par fold</em></td>
+<td><img src="docs/mlflow_train_runs.png" width="400"/><br><em>Training runs</em></td>
+<td><img src="docs/mlflow_evaluation.png" width="400"/><br><em>Metrics per fold</em></td>
 </tr>
 <tr>
 <td colspan="2"><img src="docs/mlflow_model_registry.png" width="820"/><br><em>Model Registry — alias @champion</em></td>
