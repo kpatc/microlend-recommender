@@ -196,9 +196,17 @@ For SMEs with zero interaction history:
 
 The web interface is accessible at `http://localhost:8000` after `make api`.
 
-> Existing client lookup with top recommendations:
+**Client existant — lookup & recommandations :**
 
-![UI Client Existant](docs/mlflow_evaluation.png)
+![Client existant — recommandations](docs/interface_exist_clt_rec.png)
+
+**Nouveau client — saisie du profil :**
+
+![Nouveau client — formulaire](docs/nw_clt_fill_form.png)
+
+**Nouveau client — recommandations cold-start :**
+
+![Nouveau client — recommandations](docs/nw_clt_recs.png)
 
 ### EDA — Exploratory Data Analysis
 
