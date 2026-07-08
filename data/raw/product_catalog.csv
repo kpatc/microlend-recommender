@@ -1,0 +1,9 @@
+product_id,product_code,product_name,category,risk_level,min_revenue_usd,max_amount_usd,typical_duration_days,interest_rate_annual_pct,requires_collateral,requires_bank_account,available_countries,launch_date,is_active
+1,MKT3M,Microcredit 3 months,credit,low,500,5000,90,18.0,False,False,all,2015-03-01,True
+2,MKT12M,Microcredit 12 months,credit,medium,1000,20000,365,24.0,True,True,all,2015-03-01,True
+3,AGRI-INS,Agricultural insurance,insurance,low,200,10000,180,0.0,False,False,"Kenya,Tanzania,Uganda,Rwanda,Ghana,Nigeria,Senegal",2017-06-01,True
+4,EQ-LEASE,Equipment leasing,leasing,medium,2000,100000,730,15.0,True,True,all,2016-01-01,True
+5,GRP-SAV,Group savings,savings,low,100,50000,365,0.0,False,False,all,2014-01-01,True
+6,MOB-PAY,Mobile payment setup,payments,low,50,500,30,0.0,False,False,all,2018-01-01,True
+7,INV-FIN,Invoice financing,credit,high,5000,150000,60,30.0,False,True,"Kenya,Nigeria,Ghana,Morocco",2019-06-01,True
+8,CROP-ADV,Crop advance loan,credit,medium,300,15000,120,20.0,False,False,"Kenya,Tanzania,Uganda,Rwanda,Ghana,Nigeria,Senegal",2016-09-01,True

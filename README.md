@@ -91,11 +91,17 @@ Raw Data (CRM log + SME profiles)
 
 ## Dataset
 
-The project uses a **realistic synthetic dataset** calibrated against:
-- **FinScope / FHI survey** (9,618 African SMEs) — business age, revenue, sector distributions
-- **UCI Default of Credit Card** (30,000 clients) — default rate (22.1%), bureau score distributions
+The dataset is synthetic but calibrated from real public sources to reproduce the statistical properties of actual African microfinance portfolios.
 
-Four raw tables are generated in `data/raw/`:
+**How it was built:**
+Rather than inventing numbers, country-level rates (mobile money penetration, bank account ownership, loan uptake, default probability, sector distribution) were extracted from two public datasets and then used to seed the simulation:
+
+- **FinScope / FHI SME Survey** ([finmark.org.za](https://finmark.org.za)) — 9,618 SME records across Sub-Saharan Africa. Used to calibrate business age distributions, annual revenue ranges, sector weights (agriculture 25%, retail 28%, …), urban/rural split, and financial inclusion rates per country (e.g. Kenya mobile money 85%, bank account 42%).
+- **UCI Default of Credit Card Clients** ([archive.ics.uci.edu](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients)) — 30,000 credit clients from Taiwan used to calibrate bureau score distributions (mean ≈ 650, std ≈ 90) and the overall default rate (22.1%) adapted to the African context.
+
+The generator (`src/data/synthetic_generator.py`) then produces four tables with realistic noise: 3% duplicate records, 15–30% missing bureau scores for unbanked SMEs, 79% null satisfaction scores — matching the messiness of a real CRM export.
+
+Four raw tables in `data/raw/`:
 
 | Table | Rows | Description |
 |---|---|---|

@@ -14,8 +14,7 @@ build/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Data (never commit raw/processed/synthetic data)
-data/raw/
+# Data (raw CSVs are versioned; processed/synthetic are not)
 data/processed/
 data/synthetic/
 data/outputs/
