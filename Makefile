@@ -29,8 +29,11 @@ mlflow-ui:
 dashboard:
 	venv/bin/streamlit run dashboard/app.py
 
+ui:
+	PYTHONPATH=. venv/bin/uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+
 api:
-	venv/bin/uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+	PYTHONPATH=. venv/bin/uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 
 test:
 	venv/bin/pytest tests/ -v

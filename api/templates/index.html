@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MicroLend — Système de Recommandation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #1a56db;
+      --primary-light: #e8f0fe;
+      --success: #0e9f6e;
+      --success-light: #def7ec;
+      --warning: #e3a008;
+      --warning-light: #fdf6b2;
+      --danger: #e02424;
+      --danger-light: #fde8e8;
+      --sidebar-w: 240px;
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #111827;
+      color: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+    .sidebar-brand {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid #1f2937;
+    }
+    .sidebar-brand .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 18px; font-weight: 700; color: #fff;
+    }
+    .sidebar-brand .logo .icon {
+      width: 36px; height: 36px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .sidebar-brand .tagline {
+      font-size: 11px; color: #9ca3af; margin-top: 4px; margin-left: 46px;
+    }
+    .sidebar-nav { flex: 1; padding: 16px 12px; }
+    .nav-section-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: .08em;
+      color: #6b7280; padding: 8px 8px 4px;
+    }
+    .nav-link-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; color: #d1d5db;
+      cursor: pointer; transition: background .15s, color .15s;
+      margin-bottom: 2px;
+    }
+    .nav-link-item:hover { background: #1f2937; color: #fff; }
+    .nav-link-item.active { background: var(--primary); color: #fff; }
+    .nav-link-item i { font-size: 16px; opacity: .85; }
+    .sidebar-footer {
+      padding: 16px; border-top: 1px solid #1f2937;
+      font-size: 11px; color: #6b7280;
+    }
+    .status-dot {
+      display: inline-block; width: 7px; height: 7px;
+      border-radius: 50%; background: #9ca3af; margin-right: 6px;
+    }
+    .status-dot.online { background: var(--success); }
+
+    /* ── Main content ── */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+    .topbar {
+      background: var(--card); border-bottom: 1px solid #e5e7eb;
+      padding: 16px 28px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 50;
+    }
+    .topbar-title { font-size: 18px; font-weight: 700; }
+    .topbar-title span { color: var(--primary); }
+    .topbar-stats { display: flex; gap: 24px; }
+    .stat-pill {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--muted);
+    }
+    .stat-pill strong { color: var(--text); font-size: 14px; }
+    .content { padding: 28px; flex: 1; }
+
+    /* ── Section panels ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Cards ── */
+    .card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+    .section-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section-title i { color: var(--primary); }
+
+    /* ── Search bar ── */
+    .search-box {
+      background: var(--card); border: 1px solid #e5e7eb;
+      border-radius: 12px; padding: 20px 24px;
+      display: flex; gap: 12px; align-items: flex-end;
+    }
+    .search-box .form-control, .search-box .form-select {
+      border-radius: 8px; border: 1px solid #d1d5db;
+      font-size: 14px; padding: 9px 12px;
+    }
+    .search-box .form-control:focus, .search-box .form-select:focus {
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,86,219,.15);
+    }
+    .btn-primary-custom {
+      background: var(--primary); color: #fff; border: none;
+      padding: 9px 20px; border-radius: 8px; font-weight: 600;
+      font-size: 14px; cursor: pointer; transition: background .15s;
+      white-space: nowrap;
+    }
+    .btn-primary-custom:hover { background: #1648c4; }
+    .btn-primary-custom:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* ── Profile card ── */
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .profile-card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+    .profile-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+    .profile-card .value { font-size: 22px; font-weight: 700; color: var(--text); }
+    .profile-card .value.small { font-size: 16px; }
+    .profile-card .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Risk badge ── */
+    .risk-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .risk-low  { background: var(--success-light); color: #057a55; }
+    .risk-medium { background: var(--warning-light); color: #92400e; }
+    .risk-high { background: var(--danger-light); color: #9b1c1c; }
+
+    /* ── Recommendation cards ── */
+    .recs-grid { display: grid; gap: 14px; }
+    .rec-card {
+      background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px;
+      padding: 18px 20px; display: flex; align-items: flex-start; gap: 16px;
+      transition: box-shadow .2s, border-color .2s;
+    }
+    .rec-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); border-color: #c7d7f9; }
+    .rec-rank {
+      min-width: 36px; height: 36px; background: var(--primary-light); color: var(--primary);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; flex-shrink: 0;
+    }
+    .rec-body { flex: 1; }
+    .rec-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .rec-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+    .rec-explanation { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .score-bar-wrap { flex-shrink: 0; text-align: right; min-width: 80px; }
+    .score-label { font-size: 20px; font-weight: 700; color: var(--primary); }
+    .score-sub { font-size: 11px; color: var(--muted); }
+    .bar-track { height: 6px; background: #e5e7eb; border-radius: 3px; margin-top: 6px; }
+    .bar-fill { height: 6px; border-radius: 3px; background: var(--primary); }
+
+    /* ── Form ── */
+    .form-label { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .toggle-group { display: flex; gap: 8px; }
+    .toggle-btn {
+      flex: 1; padding: 8px; border: 1.5px solid #d1d5db; border-radius: 8px;
+      background: #fff; font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: all .15s; text-align: center;
+    }
+    .toggle-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-state i { font-size: 48px; opacity: .3; display: block; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+    .spinner { display: none; text-align: center; padding: 40px; color: var(--muted); }
+    .spinner.show { display: block; }
+    .alert-error { background: var(--danger-light); border: 1px solid #fca5a5; border-radius: 8px; padding: 12px 16px; color: #7f1d1d; font-size: 13px; margin-bottom: 16px; }
+
+    /* ── Stats panel ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; }
+    .stat-card .label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+    .stat-card .value { font-size: 28px; font-weight: 700; }
+    .stat-card .value.blue { color: var(--primary); }
+    .stat-card .value.green { color: var(--success); }
+    .stat-card .value.orange { color: var(--warning); }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .profile-grid, .form-row { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sidebar ──────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo"><span class="icon">🏦</span> MicroLend</div>
+    <div class="tagline">Système de Recommandation</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <div class="nav-link-item active" onclick="showPanel('existing')" id="nav-existing">
+      <i class="bi bi-person-badge"></i> Client Existant
+    </div>
+    <div class="nav-link-item" onclick="showPanel('new')" id="nav-new">
+      <i class="bi bi-person-plus"></i> Nouveau Client
+    </div>
+    <div class="nav-section-label" style="margin-top:16px">Tableau de bord</div>
+    <div class="nav-link-item" onclick="showPanel('stats')" id="nav-stats">
+      <i class="bi bi-bar-chart"></i> Statistiques
+    </div>
+    <div class="nav-link-item" onclick="showPanel('associations')" id="nav-associations">
+      <i class="bi bi-diagram-3"></i> Associations Produits
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <span class="status-dot" id="status-dot"></span>
+    <span id="status-text">Vérification...</span><br />
+    <span style="margin-left:13px" id="model-version"></span>
+  </div>
+</aside>
+
+<!-- ── Main ─────────────────────────────────────────────────────── -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">MicroLend <span>Recommender</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Recommandations de produits financiers pour les PME africaines</div>
+    </div>
+    <div class="topbar-stats" id="topbar-stats"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── Panel : Client Existant ───────────────────────────── -->
+    <div class="panel active" id="panel-existing">
+      <div class="section-title"><i class="bi bi-search"></i>Recherche Client</div>
+
+      <div class="search-box mb-4">
+        <div style="flex:1">
+          <label class="form-label" for="sme-id-input">Identifiant Client (SME ID)</label>
+          <input type="text" class="form-control" id="sme-id-input"
+                 placeholder="ex: SME_00042" value="SME_00042" />
+        </div>
+        <div style="width:120px">
+          <label class="form-label" for="n-recs">Nb recommandations</label>
+          <select class="form-select" id="n-recs">
+            <option value="3">3</option>
+            <option value="5" selected>5</option>
+            <option value="8">8</option>
+          </select>
+        </div>
+        <button class="btn-primary-custom" onclick="searchExisting()">
+          <i class="bi bi-search me-1"></i>Analyser
+        </button>
+      </div>
+
+      <div id="existing-error" class="alert-error" style="display:none"></div>
+      <div class="spinner" id="existing-spinner"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Chargement...</p></div>
+
+      <div id="existing-results" style="display:none">
+        <div class="profile-grid" id="profile-cards"></div>
+        <div class="section-title mt-2"><i class="bi bi-stars"></i>Produits Recommandés</div>
+        <div class="recs-grid" id="existing-recs-grid"></div>
+      </div>
+
+      <div class="empty-state" id="existing-empty">
+        <i class="bi bi-person-circle"></i>
+        <p>Entrez un identifiant client pour afficher son profil<br>et ses recommandations personnalisées.</p>
+      </div>
+    </div>
+
+    <!-- ── Panel : Nouveau Client ─────────────────────────────── -->
+    <div class="panel" id="panel-new">
+      <div class="section-title"><i class="bi bi-person-plus"></i>Onboarding Nouveau Client</div>
+
+      <div class="card p-4 mb-4">
+        <div class="form-row">
+          <div>
+            <label class="form-label">Secteur d'activité</label>
+            <select class="form-select" id="new-sector">
+              <option value="agriculture">Agriculture</option>
+              <option value="retail" selected>Commerce / Retail</option>
+              <option value="services">Services</option>
+              <option value="food_processing">Transformation alimentaire</option>
+              <option value="transport">Transport</option>
+              <option value="construction">Construction</option>
+              <option value="textile">Textile</option>
+              <option value="tech">Tech</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Pays</label>
+            <select class="form-select" id="new-country">
+              <option value="Kenya" selected>Kenya</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Ghana">Ghana</option>
+              <option value="Tanzania">Tanzanie</option>
+              <option value="Uganda">Ouganda</option>
+              <option value="Rwanda">Rwanda</option>
+              <option value="Senegal">Sénégal</option>
+              <option value="Morocco">Maroc</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Chiffre d'affaires annuel (USD)</label>
+            <input type="number" class="form-control" id="new-revenue" value="2000" min="50" max="500000" />
+          </div>
+          <div>
+            <label class="form-label">Nombre d'employés</label>
+            <input type="number" class="form-control" id="new-employees" value="5" min="1" max="200" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Compte bancaire</label>
+            <div class="toggle-group">
+              <div class="toggle-btn" id="bank-no" onclick="setToggle('bank', 0)"><i class="bi bi-x-circle me-1"></i>Non</div>
+              <div class="toggle-btn active" id="bank-yes" onclick="setToggle('bank', 1)"><i class="bi bi-check-circle me-1"></i>Oui</div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Mobile Money (M-Pesa, Orange...)</label>
+            <div class="toggle-group">
+              <div class="toggle-btn" id="mm-no" onclick="setToggle('mm', 0)"><i class="bi bi-x-circle me-1"></i>Non</div>
+              <div class="toggle-btn active" id="mm-yes" onclick="setToggle('mm', 1)"><i class="bi bi-check-circle me-1"></i>Oui</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label class="form-label">Prêt antérieur</label>
+            <div class="toggle-group">
+              <div class="toggle-btn active" id="loan-no" onclick="setToggle('loan', 0)"><i class="bi bi-x-circle me-1"></i>Non</div>
+              <div class="toggle-btn" id="loan-yes" onclick="setToggle('loan', 1)"><i class="bi bi-check-circle me-1"></i>Oui</div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Zone</label>
+            <select class="form-select" id="new-zone">
+              <option value="urban">Urbaine</option>
+              <option value="rural">Rurale</option>
+              <option value="peri-urban">Péri-urbaine</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary-custom" style="width:100%" onclick="searchNew()">
+          <i class="bi bi-lightning-charge-fill me-1"></i>Obtenir les Recommandations
+        </button>
+      </div>
+
+      <div id="new-error" class="alert-error" style="display:none"></div>
+      <div class="spinner" id="new-spinner"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Analyse en cours...</p></div>
+      <div id="new-results" style="display:none">
+        <div class="section-title"><i class="bi bi-stars"></i>Recommandations Initiales</div>
+        <div style="background:var(--warning-light);border:1px solid #fbbf24;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;margin-bottom:14px">
+          <i class="bi bi-info-circle me-1"></i>
+          Ces recommandations sont basées sur les profils de PME similaires. Elles seront affinées après les premières interactions.
+        </div>
+        <div class="recs-grid" id="new-recs-grid"></div>
+      </div>
+    </div>
+
+    <!-- ── Panel : Stats ──────────────────────────────────────── -->
+    <div class="panel" id="panel-stats">
+      <div class="section-title"><i class="bi bi-bar-chart"></i>Vue d'ensemble</div>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card"><div class="label">PMEs dans la base</div><div class="value blue" id="stat-smes">—</div></div>
+        <div class="stat-card"><div class="label">Produits financiers</div><div class="value green">8</div></div>
+        <div class="stat-card"><div class="label">Modèle actif</div><div class="value orange" id="stat-model">—</div></div>
+      </div>
+      <div class="card p-4">
+        <div class="section-title mb-3"><i class="bi bi-cpu"></i>Performance des Modèles</div>
+        <table class="table table-sm" style="font-size:13px">
+          <thead><tr><th>Modèle</th><th>RMSE</th><th>MAE</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>Baseline</td><td>0.444 ± 0.005</td><td>0.394 ± 0.003</td><td><span class="risk-badge risk-low">Champion</span></td></tr>
+            <tr><td>SVD</td><td>0.447 ± 0.006</td><td>0.393 ± 0.004</td><td><span class="risk-badge risk-medium">Entraîné</span></td></tr>
+            <tr><td>NMF</td><td>0.726 ± 0.052</td><td>0.580 ± 0.040</td><td><span class="risk-badge risk-medium">Entraîné</span></td></tr>
+            <tr><td>NeuralCF</td><td>—</td><td>—</td><td><span class="risk-badge" style="background:#f3f4f6;color:#6b7280">Optionnel</span></td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px"><i class="bi bi-info-circle me-1"></i>Validation croisée 5 folds — 7 421 interactions, 4 139 PMEs</div>
+      </div>
+    </div>
+
+    <!-- ── Panel : Associations ───────────────────────────────── -->
+    <div class="panel" id="panel-associations">
+      <div class="section-title"><i class="bi bi-diagram-3"></i>Associations entre Produits</div>
+      <div class="card p-4">
+        <label class="form-label">Produit de référence</label>
+        <select class="form-select mb-3" id="assoc-product" style="max-width:320px" onchange="loadAssociations()">
+          <option value="1">Microcrédit 3 mois</option>
+          <option value="2">Microcrédit 12 mois</option>
+          <option value="3">Assurance agricole</option>
+          <option value="4">Leasing équipement</option>
+          <option value="5">Épargne groupe</option>
+          <option value="6">Paiement mobile</option>
+          <option value="7">Financement facture</option>
+          <option value="8">Prêt récolte</option>
+        </select>
+        <div id="assoc-results"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+const PRODUCT_NAMES = {
+  1:"Microcrédit 3 mois", 2:"Microcrédit 12 mois", 3:"Assurance agricole",
+  4:"Leasing équipement", 5:"Épargne groupe", 6:"Paiement mobile",
+  7:"Financement facture", 8:"Prêt récolte"
+};
+const RISK_LABELS = { low:"Faible", medium:"Moyen", high:"Élevé" };
+const toggleState = { bank: 1, mm: 1, loan: 0 };
+
+// ── Navigation ───────────────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'associations') loadAssociations();
+}
+
+// ── Toggle buttons ───────────────────────────────────────────────
+function setToggle(key, val) {
+  toggleState[key] = val;
+  const prefixes = { bank: 'bank', mm: 'mm', loan: 'loan' };
+  const p = prefixes[key];
+  document.getElementById(p + '-yes').classList.toggle('active', val === 1);
+  document.getElementById(p + '-no').classList.toggle('active', val === 0);
+}
+
+// ── Health check ─────────────────────────────────────────────────
+async function checkHealth() {
+  try {
+    const r = await fetch('/health');
+    const d = await r.json();
+    const dot = document.getElementById('status-dot');
+    const txt = document.getElementById('status-text');
+    if (d.models_loaded) {
+      dot.classList.add('online');
+      txt.textContent = 'Modèles chargés';
+    } else {
+      txt.textContent = 'Modèles en attente';
+    }
+    const s = await (await fetch('/model-stats')).json();
+    document.getElementById('stat-smes').textContent = (s.n_smes || 0).toLocaleString('fr');
+    document.getElementById('stat-model').textContent = 'Baseline @champion';
+    const ts = document.getElementById('topbar-stats');
+    ts.innerHTML = `
+      <div class="stat-pill"><strong>${(s.n_smes||0).toLocaleString('fr')}</strong> PMEs</div>
+      <div class="stat-pill"><strong>8</strong> produits</div>
+      <div class="stat-pill"><strong>${d.models_loaded ? 'Actif' : 'Inactif'}</strong></div>
+    `;
+  } catch(e) {
+    document.getElementById('status-text').textContent = 'API indisponible';
+  }
+}
+
+// ── Risk badge ───────────────────────────────────────────────────
+function riskBadge(level) {
+  const cls = { low:'risk-low', medium:'risk-medium', high:'risk-high' };
+  const icon = { low:'check-circle', medium:'dash-circle', high:'x-circle' };
+  return `<span class="risk-badge ${cls[level]||'risk-medium'}">
+    <i class="bi bi-${icon[level]||'dash-circle'}"></i> ${RISK_LABELS[level]||level}
+  </span>`;
+}
+
+// ── Score bar ────────────────────────────────────────────────────
+function scoreBar(score) {
+  const pct = Math.round((score / 5) * 100);
+  return `
+    <div class="score-bar-wrap">
+      <div class="score-label">${score.toFixed(2)}</div>
+      <div class="score-sub">/ 5.00</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+}
+
+// ── Render recommendations ────────────────────────────────────────
+function renderRecs(recs, containerId) {
+  const grid = document.getElementById(containerId);
+  if (!recs.length) {
+    grid.innerHTML = '<div class="empty-state"><i class="bi bi-inbox"></i><p>Aucune recommandation disponible.</p></div>';
+    return;
+  }
+  grid.innerHTML = recs.map((r, i) => `
+    <div class="rec-card">
+      <div class="rec-rank">${i + 1}</div>
+      <div class="rec-body">
+        <div class="rec-name">${r.product_name}</div>
+        <div class="rec-meta">
+          ${riskBadge(r.risk_level)}
+          <span style="font-size:12px;color:var(--muted)">Confiance: <strong>${(r.confidence*100).toFixed(0)}%</strong></span>
+        </div>
+        <div class="rec-explanation"><i class="bi bi-chat-quote me-1"></i>${r.explanation}</div>
+      </div>
+      ${scoreBar(r.score)}
+    </div>
+  `).join('');
+}
+
+// ── Existing client search ────────────────────────────────────────
+async function searchExisting() {
+  const smeId = document.getElementById('sme-id-input').value.trim();
+  const n = parseInt(document.getElementById('n-recs').value);
+  if (!smeId) return;
+
+  document.getElementById('existing-empty').style.display = 'none';
+  document.getElementById('existing-results').style.display = 'none';
+  document.getElementById('existing-error').style.display = 'none';
+  document.getElementById('existing-spinner').classList.add('show');
+
+  try {
+    const r = await fetch('/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sme_id: smeId, n })
+    });
+    if (!r.ok) {
+      const err = await r.json();
+      throw new Error(err.detail || 'Erreur serveur');
+    }
+    const recs = await r.json();
+
+    // Fetch similar SMEs for profile
+    let simR = null;
+    try { simR = await (await fetch(`/similar-smes/${smeId}?n=3`)).json(); } catch {}
+
+    // Build profile cards from SME ID hint
+    document.getElementById('profile-cards').innerHTML = `
+      <div class="profile-card">
+        <div class="label">Identifiant Client</div>
+        <div class="value" style="font-size:18px">${smeId}</div>
+        <div class="sub">${simR ? `${simR.length} clients similaires trouvés` : ''}</div>
+      </div>
+      <div class="profile-card">
+        <div class="label">Recommandations générées</div>
+        <div class="value blue">${recs.length}</div>
+        <div class="sub">Modèle: Baseline @champion</div>
+      </div>
+    `;
+
+    renderRecs(recs, 'existing-recs-grid');
+    document.getElementById('existing-results').style.display = 'block';
+  } catch(e) {
+    document.getElementById('existing-error').style.display = 'block';
+    document.getElementById('existing-error').textContent = `⚠ ${e.message}`;
+  } finally {
+    document.getElementById('existing-spinner').classList.remove('show');
+  }
+}
+
+// ── New client search ─────────────────────────────────────────────
+async function searchNew() {
+  const profile = {
+    sector: document.getElementById('new-sector').value,
+    country: document.getElementById('new-country').value,
+    annual_revenue_usd: parseFloat(document.getElementById('new-revenue').value),
+    n_employees: parseInt(document.getElementById('new-employees').value),
+    has_bank_account_yn: toggleState.bank,
+    has_mobile_money_yn: toggleState.mm,
+    has_previous_loan: toggleState.loan,
+    urban_rural: document.getElementById('new-zone').value,
+  };
+
+  document.getElementById('new-results').style.display = 'none';
+  document.getElementById('new-error').style.display = 'none';
+  document.getElementById('new-spinner').classList.add('show');
+
+  try {
+    const r = await fetch('/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sme_profile: profile, n: 5 })
+    });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Erreur'); }
+    const recs = await r.json();
+    renderRecs(recs, 'new-recs-grid');
+    document.getElementById('new-results').style.display = 'block';
+  } catch(e) {
+    document.getElementById('new-error').style.display = 'block';
+    document.getElementById('new-error').textContent = `⚠ ${e.message}`;
+  } finally {
+    document.getElementById('new-spinner').classList.remove('show');
+  }
+}
+
+// ── Product associations ──────────────────────────────────────────
+async function loadAssociations() {
+  const pid = document.getElementById('assoc-product').value;
+  const container = document.getElementById('assoc-results');
+  container.innerHTML = '<div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm"></div></div>';
+  try {
+    const r = await fetch(`/product-associations/${pid}?n=7`);
+    const data = await r.json();
+    if (!data.length) { container.innerHTML = '<p class="text-muted">Aucune association trouvée.</p>'; return; }
+    container.innerHTML = `
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+        Les PME qui ont adopté <strong>${PRODUCT_NAMES[parseInt(pid)]}</strong> ont également adopté :
+      </p>
+      ${data.map(a => {
+        const pct = Math.round(a.co_adoption_rate * 100);
+        const sim = Math.round(a.similarity * 100);
+        return `
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f3f4f6">
+            <div style="flex:1;font-size:14px;font-weight:600">${PRODUCT_NAMES[a.product_id]||'P'+a.product_id}</div>
+            <div style="width:120px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Co-adoption</div>
+              <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--success)"></div></div>
+              <div style="font-size:11px;font-weight:600;color:var(--success)">${pct}%</div>
+            </div>
+            <div style="width:100px;text-align:right">
+              <div style="font-size:11px;color:var(--muted)">Similarité</div>
+              <div style="font-size:13px;font-weight:700;color:var(--primary)">${sim}%</div>
+            </div>
+          </div>`;
+      }).join('')}
+    `;
+  } catch(e) {
+    container.innerHTML = `<p class="text-danger">Erreur: ${e.message}</p>`;
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+document.getElementById('sme-id-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') searchExisting();
+});
+checkHealth();
+</script>
+</body>
+</html>

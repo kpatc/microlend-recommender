@@ -6,7 +6,6 @@
 ![MLflow](https://img.shields.io/badge/MLflow-3.14-orange?logo=mlflow)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.x-red?logo=pytorch)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.111-green?logo=fastapi)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.35-red?logo=streamlit)
 ![Tests](https://img.shields.io/badge/tests-14%20passed-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
@@ -188,6 +187,51 @@ For SMEs with zero interaction history:
 3. Aggregate their adoption patterns as proxy scores
 4. Confidence score = fraction of neighbors who adopted each product
 5. Automatic handoff to CF after first real interaction
+
+---
+
+## Screenshots
+
+### Interface MFI
+
+The web interface is accessible at `http://localhost:8000` after `make api`.
+
+> Existing client lookup with top recommendations:
+
+![UI Client Existant](docs/mlflow_evaluation.png)
+
+### EDA — Exploratory Data Analysis
+
+<table>
+<tr>
+<td><img src="docs/eda_01_countries.png" width="400"/><br><em>Distribution par pays</em></td>
+<td><img src="docs/eda_02_sectors.png" width="400"/><br><em>Répartition sectorielle</em></td>
+</tr>
+<tr>
+<td><img src="docs/eda_03_revenue.png" width="400"/><br><em>Distribution des revenus (log)</em></td>
+<td><img src="docs/eda_04_financial_inclusion.png" width="400"/><br><em>Inclusion financière par pays</em></td>
+</tr>
+<tr>
+<td><img src="docs/eda_05_interactions.png" width="400"/><br><em>Funnel interactions & adoptions</em></td>
+<td><img src="docs/eda_06_matrix.png" width="400"/><br><em>Structure matrice user-item & co-adoption</em></td>
+</tr>
+</table>
+
+### Model Evaluation
+
+![Model CV Results](docs/model_01_cv_results.png)
+
+### MLflow Tracking & Model Registry
+
+<table>
+<tr>
+<td><img src="docs/mlflow_train_runs.png" width="400"/><br><em>Runs d'entraînement</em></td>
+<td><img src="docs/mlflow_evaluation.png" width="400"/><br><em>Métriques par fold</em></td>
+</tr>
+<tr>
+<td colspan="2"><img src="docs/mlflow_model_registry.png" width="820"/><br><em>Model Registry — alias @champion</em></td>
+</tr>
+</table>
 
 ---
 

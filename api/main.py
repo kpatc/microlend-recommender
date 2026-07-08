@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional, List
+from pathlib import Path
 import uvicorn
 import numpy as np
 
@@ -9,6 +11,8 @@ app = FastAPI(
     description="Financial product recommendation for African SMEs",
     version="1.0.0",
 )
+
+_base = Path(__file__).parent
 
 models_loaded = False
 cf_model = None
@@ -80,6 +84,11 @@ RISK_LEVELS = {
     1: "low", 2: "medium", 3: "low", 4: "medium",
     5: "low", 6: "low", 7: "high", 8: "medium",
 }
+
+
+@app.get("/", response_class=FileResponse)
+def index():
+    return FileResponse(_base / "templates" / "index.html", media_type="text/html")
 
 
 @app.get("/health")
