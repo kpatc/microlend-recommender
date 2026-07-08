@@ -1,4 +1,4 @@
-.PHONY: setup generate train register mlflow-ui dashboard api test clean
+.PHONY: setup generate train register mlflow-ui api test clean
 
 setup:
 	python3 -m venv venv && \
@@ -25,9 +25,6 @@ promoted = set_production(model_name, metric='rmse'); \
 
 mlflow-ui:
 	venv/bin/mlflow ui --backend-store-uri sqlite:///mlflow.db --port 5000
-
-dashboard:
-	venv/bin/streamlit run dashboard/app.py
 
 ui:
 	PYTHONPATH=. venv/bin/uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
